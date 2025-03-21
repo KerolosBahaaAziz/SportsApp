@@ -16,17 +16,10 @@ class HomeCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var sportNameLabel: UILabel!
     
     override init(frame: CGRect) {
-            super.init(frame: frame)
+        super.init(frame: frame)
         contentView.addSubview(sportImage)
-       // setupUI()
+       setupUI()
 
-            // Set constraints
-        NSLayoutConstraint.activate([
-        sportImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-        sportImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-        sportImage.widthAnchor.constraint(equalToConstant: 100), // Set desired width
-        sportImage.heightAnchor.constraint(equalToConstant: 100) // Set desired height
-            ])
     }
     
     required init?(coder: NSCoder) {
@@ -40,5 +33,22 @@ class HomeCollectionViewCell: UICollectionViewCell {
         overView?.backgroundColor = UIColor.black.withAlphaComponent(0.5)
     }
     
+    override func layoutSubviews() {
+            super.layoutSubviews()
+       self.layer.cornerRadius = 25
+       self.layer.masksToBounds = true // Ensures content does not overflow
+    }
+    
+    func setupUI(){
+        
+        //constrains
+        NSLayoutConstraint.activate([
+        sportImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+        sportImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+        sportImage.widthAnchor.constraint(equalToConstant: 100), // Set desired width
+        sportImage.heightAnchor.constraint(equalToConstant: 100) // Set desired height
+            ])
+    }
+        
 }
 

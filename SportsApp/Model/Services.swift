@@ -17,7 +17,7 @@ class Services
         let task = session.dataTask(with: request) { data, response, error in
             do
             {
-                let json = try JSONDecoder().decode(Leagues.self, from: data!)
+                let json = try JSONDecoder().decode(Leagues.self, from: data ?? Data())
                 print(json.result![0].league_name)
                 complitionHandler(json)
                 
@@ -40,7 +40,7 @@ class Services
         let task = session.dataTask(with: request) { data, response, error in
             do
             {
-                let json = try JSONDecoder().decode(Teams.self, from: data!)
+                let json = try JSONDecoder().decode(Teams.self, from: data ?? Data())
                 //print(json.result![0].team_name)
                 complitionHandler(json)
                 
@@ -63,7 +63,7 @@ class Services
         let task = session.dataTask(with: request) { data, response, error in
             do
             {
-                let json = try JSONDecoder().decode(FinishedMatches.self, from: data!)
+                let json = try JSONDecoder().decode(FinishedMatches.self, from: data ?? Data())
                 print("=========================")
                 print(json.result![0].event_final_result)
                 complitionHandler(json)
@@ -87,7 +87,7 @@ class Services
         let task = session.dataTask(with: request) { data, response, error in
             do
             {
-                let json = try JSONDecoder().decode(UpcomingMatches.self, from: data!)
+                let json = try JSONDecoder().decode(UpcomingMatches.self, from: data ?? Data())
                 print("=========================")
                 print(json.result![0].event_final_result)
                 complitionHandler(json)

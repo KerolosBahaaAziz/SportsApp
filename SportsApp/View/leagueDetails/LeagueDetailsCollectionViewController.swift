@@ -11,6 +11,15 @@ private let reuseIdentifier = "Cell"
 
 class LeagueDetailsCollectionViewController: UICollectionViewController , FinishedMatchesProtocol, UpcomingMatchesProtocol , TeamsProtocol{
     
+    var myFinishedMatches : [FinishedMatchesDetails] = []
+    var myUpcomingMatches : [UpcomingMatchesDetails] = []
+    var myTeams : [TeamDetails] = []
+    var league : LeaguesDetails?
+    var selectedLeague : [FinishedMatchesDetails] = []
+    var upcomingSelected : [UpcomingMatchesDetails] = []
+    var isFavorite = 0
+    var isConnected = false
+    var fetchTeam : String = ""
     
     func renderToView(result: Teams) {
        
@@ -40,17 +49,6 @@ class LeagueDetailsCollectionViewController: UICollectionViewController , Finish
     }
     
     
-    var myFinishedMatches : [FinishedMatchesDetails] = []
-    var myUpcomingMatches : [UpcomingMatchesDetails] = []
-    var myTeams : [TeamDetails] = []
-    var league : LeaguesDetails?
-    var selectedLeague : [FinishedMatchesDetails] = []
-    var upcomingSelected : [UpcomingMatchesDetails] = []
-    var isFavorite = 0
-    var isConnected = false
-    var fetchTeam : String = ""
-    
-    
     func renderToView(result: FinishedMatches) {
         print("model h2h done")
         print(result.result!.count)
@@ -65,11 +63,32 @@ class LeagueDetailsCollectionViewController: UICollectionViewController , Finish
         
     }
     
+   /* func applyGradientBackground() {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [UIColor.systemBlue.cgColor, UIColor.black.cgColor]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0) // Top-left
+        gradientLayer.endPoint = CGPoint(x: 1, y: 1) // Bottom-right
+        gradientLayer.frame = CGRect(x: 0, y: 0, width: collectionView.contentSize.width, height: collectionView.contentSize.height)
+
+        let backgroundView = UIView(frame: gradientLayer.frame)
+        backgroundView.layer.insertSublayer(gradientLayer, at: 0)
+
+        collectionView.backgroundView = backgroundView
+    }*/
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if let gradientLayer = collectionView.backgroundView?.layer.sublayers?.first as? CAGradientLayer {
+            gradientLayer.frame = CGRect(x: 0, y: 0, width: collectionView.contentSize.width, height: collectionView.contentSize.height)
+        }
+    }
+
    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        //applyGradientBackground()
         collectionView.register(UICollectionReusableView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: "header")
@@ -90,7 +109,7 @@ class LeagueDetailsCollectionViewController: UICollectionViewController , Finish
                 )
         
         
-        rightButton.tintColor = .blue // Set tint color
+        rightButton.tintColor = .blue
         navigationItem.rightBarButtonItem = rightButton
 
         if DataBase.isKeyStored(key: (league?.league_key)!)
@@ -203,6 +222,7 @@ class LeagueDetailsCollectionViewController: UICollectionViewController , Finish
             alignment: .top)
         
         section.boundarySupplementaryItems = [header]
+        //applyGradientBackground()
         return section
     }
 
@@ -244,7 +264,7 @@ func drawThirdSection()->NSCollectionLayoutSection
     group.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 0, trailing: 10)
     
     let section = NSCollectionLayoutSection(group: group)
-    //section.orthogonalScrollingBehavior = .continuous
+    section.orthogonalScrollingBehavior = .continuous
     section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 16, bottom: 16, trailing: 10)
     
     let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
@@ -300,13 +320,13 @@ func drawThirdSection()->NSCollectionLayoutSection
         switch indexPath.section {
         case 0:
             let Fcell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! LeagueDetailsCollectionViewCell
-           
             Fcell.layer.cornerRadius = 30
-
+            
             Fcell.contentView.layer.cornerRadius = 15
             Fcell.contentView.layer.masksToBounds = true
             //cell.contentView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.3)
-            Fcell.vsL.font = UIFont.boldSystemFont(ofSize: 25)
+            Fcell.vsL.font = UIFont.boldSystemFont(ofSize: 28)
+            Fcell.vsL.textColor = .white
             if selectedLeague.count > 0
             {
                 let awaylogoUrl = URL(string: selectedLeague[indexPath.row].away_team_logo!)
@@ -316,6 +336,8 @@ func drawThirdSection()->NSCollectionLayoutSection
                 Fcell.homeImg.kf.setImage(with: homelogoUrl)
                 
                 Fcell.resultL.text = selectedLeague[indexPath.row].event_final_result
+                Fcell.resultL.textColor = .white
+                Fcell.dateL.textColor = .white
                 Fcell.dateL.text = selectedLeague[indexPath.row].event_date
             }
             cell = Fcell
@@ -326,7 +348,8 @@ func drawThirdSection()->NSCollectionLayoutSection
             Ccell.contentView.layer.cornerRadius = 15
             Ccell.contentView.layer.masksToBounds = true
             //cell.contentView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.3)
-            Ccell.vsL.font = UIFont.boldSystemFont(ofSize: 25)
+            Ccell.vsL.font = UIFont.boldSystemFont(ofSize: 28)
+            Ccell.vsL.textColor = .white
             if upcomingSelected.count > 0
             {
                 let awaylogoUrl = URL(string: upcomingSelected[indexPath.row].away_team_logo!)
@@ -337,6 +360,9 @@ func drawThirdSection()->NSCollectionLayoutSection
                 
                 Ccell.dateL.text = upcomingSelected[indexPath.row].event_date
                 Ccell.resultL.text = upcomingSelected[indexPath.row].event_time
+                
+                Ccell.dateL.textColor = .white
+                Ccell.resultL.textColor = .white
             }
             cell = Ccell
 
@@ -393,10 +419,16 @@ func drawThirdSection()->NSCollectionLayoutSection
         switch indexPath.section {
         case 0:
             titleLabel.text = "Latest Events"
+            titleLabel.textColor = .kohlyBlue
+            titleLabel.font = UIFont.boldSystemFont(ofSize: 20)
         case 1:
             titleLabel.text = "Upcoming Events"
+            titleLabel.textColor = .kohlyBlue
+            titleLabel.font = UIFont.boldSystemFont(ofSize: 20)
         default:
             titleLabel.text = "Teams"
+            titleLabel.textColor = .kohlyBlue
+            titleLabel.font = UIFont.boldSystemFont(ofSize: 20)
         }
         
         header.addSubview(titleLabel)

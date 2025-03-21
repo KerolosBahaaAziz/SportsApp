@@ -12,10 +12,25 @@ private let reuseIdentifier = "Cell"
 class HomeCollectionViewController: UICollectionViewController,UICollectionViewDelegateFlowLayout {
 
     var photos = ["football" , "basketball" , "tennis" , "cricket"]
-    
+
+    func gradientImage(size: CGSize, colors: [UIColor]) -> UIImage? {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = CGRect(origin: .zero, size: size)
+        gradientLayer.colors = colors.map { $0.cgColor }
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0) // Top-left
+        gradientLayer.endPoint = CGPoint(x: 1, y: 1)   // Bottom-right
+
+        UIGraphicsBeginImageContext(size)
+        guard let context = UIGraphicsGetCurrentContext() else { return nil }
+        gradientLayer.render(in: context)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        tabBarController?.tabBar.barTintColor = UIColor.kohlyBlue
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -25,13 +40,19 @@ class HomeCollectionViewController: UICollectionViewController,UICollectionViewD
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .black
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.blue]
+        appearance.backgroundColor = .white
+        appearance.titleTextAttributes = [.font: UIFont.boldSystemFont(ofSize: 24), .foregroundColor: UIColor.kohlyBlue
+        ]
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
-
+        
+        if let gradientImage = gradientImage(size: CGSize(width: UIScreen.main.bounds.width, height: 44),
+                                                colors: [UIColor.blue, UIColor.purple]) {
+               appearance.backgroundImage = gradientImage
+           }
         self.navigationItem.title = "Sports"
         
+        navigationController?.navigationBar.tintColor = .kohlyBlue
     }
 
    
@@ -147,4 +168,8 @@ class HomeCollectionViewController: UICollectionViewController,UICollectionViewD
     }
     */
 
+}
+
+extension UIColor {
+    static let kohlyBlue = UIColor(red: 0.0, green: 0.18, blue: 0.65, alpha: 1.0) // Example RGB values
 }

@@ -26,12 +26,39 @@ class FootTableViewController: UITableViewController, LeaguesProtocol {
     }
     
 
+    func applyGradientBackground() {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [UIColor.systemBlue.cgColor, UIColor.black.cgColor]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0) // Top-left
+        gradientLayer.endPoint = CGPoint(x: 1, y: 1) // Bottom-right
+        gradientLayer.frame = CGRect(x: 0, y: 0, width: tableView.contentSize.width, height: tableView.contentSize.height)
+
+        let backgroundView = UITableView(frame: gradientLayer.frame)
+        backgroundView.layer.insertSublayer(gradientLayer, at: 0)
+
+        tableView.backgroundView = backgroundView
+        self.view.insertSubview(backgroundView, at: 0) // Add it behind everything
+
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if let gradientLayer = tableView.backgroundView?.layer.sublayers?.first as? CAGradientLayer {
+            gradientLayer.frame = CGRect(x: 0, y: 0, width: tableView.contentSize.width, height: tableView.contentSize.height)
+        }
+    }
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.separatorStyle = .none // Hide default separators
-
+        tabBarController?.tabBar.barTintColor = UIColor.white
+        //applyGradientBackground()
+        
         isConnected = PresentNetwork.checkNtwork()
+        print("isConnected = \(isConnected)")
         if isConnected
         {
             FetchLeagues.fetchView(view: self)
@@ -44,7 +71,7 @@ class FootTableViewController: UITableViewController, LeaguesProtocol {
             }))
             present(alertConnection, animated: true, completion: nil)
         }
-        
+                
        /* let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 50))
         headerView.backgroundColor = UIColor.gray
 
@@ -73,10 +100,30 @@ class FootTableViewController: UITableViewController, LeaguesProtocol {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! FootTableViewCell
-
+        
+        //let blurEffect = UIBlurEffect(style: .light)
+       // let blurView = UIVisualEffectView(effect: blurEffect)
+        //blurView.frame = cell.bounds
+        //blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        //cell.insertSubview(blurView, at: 0)
         cell.contentView.layer.cornerRadius = 15
         cell.contentView.layer.masksToBounds = true
-        cell.contentView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.3)
+        //cell.contentView.backgroundColor = UIColor.systemGray6.withAlphaComponent(0.3)
+        cell.contentView.layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
+
+            // Create a new gradient layer
+            let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [UIColor.systemBlue.cgColor, UIColor.black.cgColor]
+            gradientLayer.startPoint = CGPoint(x: 0, y: 0) // Top-left
+            gradientLayer.endPoint = CGPoint(x: 1, y: 1) // Bottom-right
+            gradientLayer.frame = cell.bounds
+            gradientLayer.cornerRadius = 15 // Optional: round corners
+
+            // Add the gradient to the cell's contentView
+            cell.contentView.layer.insertSublayer(gradientLayer, at: 0)
+
+        //cell.layer.shadowColor = UIColor.white.cgColor
                
         
         cell.LeagueName.text = myLeagues[indexPath.row].league_name
@@ -90,7 +137,7 @@ class FootTableViewController: UITableViewController, LeaguesProtocol {
             // Optionally set a placeholder image
              print("no photo")
         }
-            
+        cell.backgroundColor = .clear
         return cell
     }
     
@@ -111,7 +158,7 @@ class FootTableViewController: UITableViewController, LeaguesProtocol {
         
     }
     
-    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+   /* override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView()
         headerView.backgroundColor = UIColor.blue  // Background color of the header
 
@@ -129,7 +176,7 @@ class FootTableViewController: UITableViewController, LeaguesProtocol {
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 40 // Adjust as needed
     }
-    
+    */
     
     
     /*override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {

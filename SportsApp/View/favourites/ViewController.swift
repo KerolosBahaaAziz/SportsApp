@@ -39,8 +39,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .black
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.blue]
+        appearance.backgroundColor = .white
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.kohlyBlue, .font: UIFont.boldSystemFont(ofSize: 24)]
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
 
@@ -66,13 +66,22 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! FootTableViewCell
        
+        // Create a new gradient layer
+        let gradientLayer = CAGradientLayer()
+    gradientLayer.colors = [UIColor.systemBlue.cgColor, UIColor.black.cgColor]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0) // Top-left
+        gradientLayer.endPoint = CGPoint(x: 1, y: 1) // Bottom-right
+        gradientLayer.frame = cell.bounds
+        gradientLayer.cornerRadius = 15 // Optional: round corners
 
-        cell.contentView.layer.cornerRadius = 15
-        cell.contentView.layer.masksToBounds = true
-        cell.contentView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.3)
+        // Add the gradient to the cell's contentView
+        cell.contentView.layer.insertSublayer(gradientLayer, at: 0)
+        
+        //cell.contentView.layer.cornerRadius = 15
+        //cell.contentView.layer.masksToBounds = true
         
         (cell.viewWithTag(2) as! UILabel).text = favouriteLeagues[indexPath.row].value(forKey: "league") as? String
-        
+        (cell.viewWithTag(2) as! UILabel).textColor = .white
         if let logoUrlString = favouriteLeagues[indexPath.row].value(forKey: "logo") as? String
         {
             let logoUrl = URL(string: logoUrlString)
